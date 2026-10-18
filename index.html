@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة تنظيف النصوص وإزالة التكرارات والأسطر الفارغة أونلاين</title>
+    <meta name="description" content="أداة مجانية وسريعة لتنظيف النصوص، إزالة الكلمات والأسطر المكررة، حذف المسافات الزائدة والأسطر الفارغة مباشرة من المتصفح وبدون برامج.">
+    <meta name="keywords" content="تنظيف النصوص, إزالة التكرارات, حذف الأسطر الفارغة, ترتيب النصوص, أداة معالجة النصوص">
+    
+    <!-- تحميل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- الهيدر -->
+    <header class="bg-white shadow-sm py-4 px-6 text-center">
+        <h1 class="text-2xl font-bold text-indigo-600">منظف ومُهذب النصوص الذكي</h1>
+        <p class="text-sm text-slate-500 mt-1">احذف التكرارات، نظم أسطرك، ونظف النصوص بضغطة زر واحدة</p>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-2xl mx-auto p-4 sm:p-6 w-full flex-grow space-y-4">
+        
+        <div class="bg-white rounded-2xl shadow-md p-5 sm:p-6 space-y-4">
+            
+            <!-- إدخال النص -->
+            <div>
+                <label class="block text-sm font-semibold mb-2 text-slate-700">الصق النص الخاص بك هنا:</label>
+                <textarea id="inputText" rows="6" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="اكتب أو الصق النص هنا..."></textarea>
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                    <span id="inputStats">الحروف: 0 | الكلمات: 0</span>
+                </div>
+            </div>
+
+            <!-- أزرار العمليات -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button onclick="removeDuplicates()" class="bg-indigo-50 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-indigo-100 transition text-sm">
+                    حذف الأسطر المكررة 🔄
+                </button>
+                <button onclick="removeEmptyLines()" class="bg-indigo-50 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-indigo-100 transition text-sm">
+                    إزالة الأسطر الفارغة ✂️
+                </button>
+                <button onclick="cleanSpaces()" class="bg-indigo-50 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-indigo-100 transition text-sm">
+                    تنظيف المسافات الزائدة 🧹
+                </button>
+            </div>
+
+            <!-- الناتج -->
+            <div class="border-t pt-4 space-y-2">
+                <div class="flex justify-between items-center">
+                    <label class="block text-sm font-semibold text-slate-700">النص النهائي:</label>
+                    <button onclick="copyOutput()" class="bg-emerald-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg hover:bg-emerald-700 transition">
+                        نسخ النص 📋
+                    </button>
+                </div>
+                <textarea id="outputText" rows="6" readonly class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none" placeholder="سيظهر النص المنظم هنا..."></textarea>
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span id="outputStats">الحروف: 0 | الكلمات: 0</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-white border-t py-4 text-center text-xs text-slate-400">
+        جميع عمليات معالجة النصوص تتم محلياً داخل متصفحك لسرعة وأمان تام.
+    </footer>
+
+    <!-- سكريبت المعالجة -->
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const inputStats = document.getElementById('inputStats');
+        const outputStats = document.getElementById('outputStats');
+
+        function updateStats(text, element) {
+            const chars = text.length;
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            element.textContent = `الحروف: ${chars} | الكلمات: ${words}`;
+        }
+
+        inputText.addEventListener('input', function() {
+            updateStats(inputText.value, inputStats);
+            outputText.value = inputText.value; // افتراضياً فالأول
+            updateStats(outputText.value, outputStats);
+        });
+
+        function removeDuplicates() {
+            let lines = inputText.value.split('\n');
+            let uniqueLines = [...new Set(lines)];
+            outputText.value = uniqueLines.join('\n');
+            updateStats(outputText.value, outputStats);
+        }
+
+        function removeEmptyLines() {
+            let lines = inputText.value.split('\n');
+            let filteredLines = lines.filter(line => line.trim() !== '');
+            outputText.value = filteredLines.join('\n');
+            updateStats(outputText.value, outputStats);
+        }
+
+        function cleanSpaces() {
+            let text = inputText.value;
+            // استبدال أي مسافات متعددة بمسافة واحدة وضبط المسافات حول السطور
+            let cleaned = text.replace(/[ \t]+/g, ' ').replace(/\n +/g, '\n').replace(/ +\n/g, '\n');
+            outputText.value = cleaned;
+            updateStats(outputText.value, outputStats);
+        }
+
+        function copyOutput() {
+            if (!outputText.value) return;
+            navigator.clipboard.writeText(outputText.value);
+            alert('تم نسخ النص بنجاح!');
+        }
+    </script>
+</body>
+</html>
